@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fullscreen Timer</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased;margin:0;background:#000;color:#fff;overflow:hidden}.App{text-align:center}.clock{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:30vw;font-family:Geneva,Tahoma,sans-serif;white-space:nowrap;user-select:none;caret-color:transparent}.clock.blink .editing{visibility:hidden}.tips{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);color:#666;line-height:2;white-space:nowrap}.tips li{text-align:left}.tips button{background:transparent;color:inherit;font-size:12px}.tips li>button{border:2px solid #333;border-radius:4px;padding:0 4px;cursor:pointer;margin-right:4px}.tip{margin-left:4px}.tip>button{border:none;cursor:pointer;font-size:inherit;padding:0}.tips[hidden]{display:none}
+</style></head><body><main class="App">
+<div class="clock" aria-label="Timer"><span class="time minute">00</span>:<span class="time second">00</span></div>
+<ul class="tips">
+<li><button data-action="fullscreen">F</button>-<span class="tip" id="full-label">enter fullscreen</span></li>
+<li><button data-action="left">←</button><button data-action="right">→</button><button data-action="up">↑</button><button data-action="down">↓</button>-<span class="tip">edit timer</span></li>
+<li><button data-action="reset">R</button>-<span class="tip">reset timer</span></li>
+<li><button data-action="mode">S</button>-<span class="tip"><button data-action="countdown" id="countdown">countdown</button> or <button data-action="stopwatch" id="stopwatch">stopwatch ✓</button></span></li>
+<li><button data-action="run">Space</button>-<span class="tip" id="run-label">start timer</span></li>
+</ul></main>
+<script>
+(()=>{'use strict';
+const clock=document.querySelector('.clock'),minute=document.querySelector('.minute'),second=document.querySelector('.second'),tips=document.querySelector('.tips');
+let seconds=0,paused=true,mode='stopwatch',editing=null,blink=false,anchor=0,base=0,nativeFull=false;
+const pad=n=>String(n).padStart(2,'0');
+function sync(){if(paused)return;const elapsed=(performance.now()-anchor)/1000;seconds=Math.max(0,base+(mode==='countdown'?-elapsed:elapsed));if(mode==='countdown'&&seconds<=0){seconds=0;paused=true;}}
+function render(){minute.textContent=pad(Math.floor(seconds/60));second.textContent=pad(Math.floor(seconds%60));minute.classList.toggle('editing',editing==='minute');second.classList.toggle('editing',editing==='second');clock.classList.toggle('blink',!!editing&&blink);tips.hidden=!paused;document.getElementById('full-label').textContent=(nativeFull||document.fullscreenElement)?'exit fullscreen':'enter fullscreen';document.getElementById('run-label').textContent=paused?'start timer':'pause timer';document.getElementById('countdown').textContent='countdown'+(mode==='countdown'?' ✓':'');document.getElementById('stopwatch').textContent='stopwatch'+(mode==='stopwatch'?' ✓':'');}
+async function fullscreen(){if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.native){window.webkit.messageHandlers.native.postMessage('fullscreen');return;}try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){console.warn(e.message);}render();}
+function act(action){sync();switch(action){
+case 'fullscreen':fullscreen();return;
+case 'run':paused=!paused;editing=null;blink=false;if(!paused){base=seconds;anchor=performance.now();}break;
+case 'reset':seconds=0;paused=true;editing=null;blink=false;break;
+case 'mode':case 'countdown':case 'stopwatch':mode=action==='mode'?(mode==='stopwatch'?'countdown':'stopwatch'):action;if(!paused){base=seconds;anchor=performance.now();}break;
+case 'edit':editing=editing?null:'second';blink=false;break;
+case 'left':case 'right':case 'up':case 'down':paused=true;blink=false;if(action==='left')editing='minute';else if(action==='right')editing='second';else{editing=editing||'second';seconds=Math.max(0,Math.floor(seconds)+(action==='up'?1:-1)*(editing==='minute'?60:1));}break;
+}render();}
+const keys={f:'fullscreen',r:'reset',s:'mode',' ':'run',Enter:'edit',ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'};
+document.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey||e.metaKey)return;const action=keys[e.key.length===1?e.key.toLowerCase():e.key];if(action){e.preventDefault();if(!e.repeat||['left','right','up','down'].includes(action))act(action);}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b){act(b.dataset.action);b.blur();}});
+clock.addEventListener('dblclick',fullscreen);document.addEventListener('fullscreenchange',render);
+window.addEventListener('native-fullscreen-enter',()=>{nativeFull=true;render();});window.addEventListener('native-fullscreen-exit',()=>{nativeFull=false;render();});
+setInterval(()=>{blink=!blink;render();},500);
+function frame(){sync();render();requestAnimationFrame(frame);}requestAnimationFrame(frame);render();
+})();
+</script>
+<!-- UI based on Fullscreen Timer, Copyright (c) 2019 alphakevin. MIT License; see LICENSE. -->
+</body></html>
