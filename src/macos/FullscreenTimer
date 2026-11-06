@@ -1,0 +1,3 @@
+#!/bin/sh
+CONTENTS="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+exec /usr/bin/osascript -l JavaScript "$CONTENTS/Resources/main.js" "$CONTENTS/Resources/index.html"
