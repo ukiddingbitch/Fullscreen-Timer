@@ -6,9 +6,9 @@ Offline stopwatch and countdown timer for Windows, Linux, and macOS. Controls di
 
 | Platform | File | Size |
 | --- | --- | --- |
-| Windows | [EXE](FullscreenTimer-Windows.exe) | 16 KB |
-| Linux x86_64 | [AppImage](FullscreenTimer-Linux-x86_64.AppImage) or [TAR.GZ](FullscreenTimer-Linux-x86_64.tar.gz) | 935 KB / 8 KB |
-| macOS — Intel and Apple Silicon | [ZIP](FullscreenTimer-macOS.zip) | 6 KB |
+| Windows | [EXE](FullscreenTimer-Windows.exe?raw=true) | 16 KB |
+| Linux x86_64 | [AppImage](FullscreenTimer-Linux-x86_64.AppImage?raw=true) or [TAR.GZ](FullscreenTimer-Linux-x86_64.tar.gz?raw=true) | 935 KB / 8 KB |
+| macOS — Intel and Apple Silicon | [ZIP](FullscreenTimer-macOS.zip?raw=true) | 6 KB |
 
 **Windows:** Open the EXE.  
 **Linux:** Mark the AppImage as executable, or extract the TAR.GZ and run `FullscreenTimer`.  
@@ -53,3 +53,4 @@ python3 tools/build_appimage.py --runtime /path/to/runtime-x86_64 --binary build
 ## License
 
 MIT; see `LICENSE`. The interface is based on [alphakevin/fullscreen-timer](https://github.com/alphakevin/fullscreen-timer). AppImage runtime licensing information is included in `THIRD_PARTY_LICENSES.txt`. Package checksums are available in `SHA256SUMS.txt`.
+
